@@ -1,0 +1,1 @@
+{"level":"error","time":"2023-11-20 10:28:16.764","caller":"service/service.go:68","func":"task/client/service.heartBeat","msg":"节点心跳服务异常,read tcp4 10.0.2.15:40438->47.112.17.60:9800: read: connection reset by peer"}
