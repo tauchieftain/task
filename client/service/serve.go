@@ -217,6 +217,12 @@ func (cs *CrontabServe) Log(request *proto.CrontabLogListArgs, response *proto.C
 	return nil
 }
 
+func (cs *CrontabServe) Clean(request *proto.CrontabGetArgs, response *int64) error {
+	m := model.Task().Model(&model.CrontabLog{}).Where("crontab_id=?", request.CrontabID)
+	m.Count(response)
+	return m.Delete(&model.CrontabLog{}).Error
+}
+
 type DaemonServe struct {
 	daemon *daemon
 }
