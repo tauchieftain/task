@@ -73,7 +73,7 @@ func (c *crontab) run() {
 	for i := range c.ready {
 		jobID := i.Value.(*crontabJob).id
 		if j, ok := c.jobs[jobID]; ok {
-			j.exec()
+			go j.exec()
 		}
 	}
 }
@@ -162,6 +162,15 @@ func (c *crontab) getQueueItem() *item {
 	return i
 }
 
+func (c *crontab) removeQueueItem(jobID uint) {
+	for k, i := range c.queue {
+		if i.Value.(*crontabJob).id == jobID {
+			heap.Remove(&c.queue, k)
+			break
+		}
+	}
+}
+
 func (c *crontab) addOnceJob(j *crontabJob) (*crontabJob, error) {
 	c.mux.Lock()
 	j.once = true
@@ -183,6 +192,7 @@ func (c *crontab) kill(jobID uint) {
 			j.process.cancel()
 		}
 		delete(c.jobs, jobID)
+		c.removeQueueItem(jobID)
 	}
 	for uniqueID, j := range c.onceJobs {
 		if j.id == jobID {
