@@ -63,7 +63,8 @@ func setCrontabRoute(e *gin.Engine) {
 		POST("/exec", cronService.execCrontab).
 		POST("/kill", cronService.killCrontab).
 		POST("/del", cronService.delCrontab).
-		POST("/log/list", cronService.log)
+		POST("/log/list", cronService.log).
+		POST("/log/clean", cronService.clean)
 }
 
 func setDaemonRoute(e *gin.Engine) {

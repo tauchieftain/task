@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"task/model"
 	"task/pkg/mrpc"
 	"task/pkg/proto"
@@ -489,6 +490,7 @@ func (n *cron) log(ctx *gin.Context) {
 	}
 	err = mrpc.Call(fn.Address, "CrontabServe.Log", context.TODO(), listArgs, &reply)
 	if err != nil {
+		log.Println(err.Error())
 		failed(ctx, 3041, "查询失败")
 		return
 	}
@@ -511,4 +513,25 @@ func (n *cron) log(ctx *gin.Context) {
 		}
 	}
 	success(ctx, "查询成功", r)
+}
+
+func (n *cron) clean(ctx *gin.Context) {
+	var cleanArgs proto.CrontabGetArgs
+	if err := ctx.ShouldBindJSON(&cleanArgs); err != nil {
+		failed(ctx, 3042, "请求参数不合法")
+		return
+	}
+	var fn model.Node
+	err := model.Task().First(&fn, "id=?", cleanArgs.NodeID).Error
+	if err != nil {
+		failed(ctx, 3043, "节点不存在")
+		return
+	}
+	var reply int64
+	err = mrpc.Call(fn.Address, "CrontabServe.Clean", context.TODO(), cleanArgs, &reply)
+	if err != nil {
+		failed(ctx, 3044, "查询失败")
+		return
+	}
+	success(ctx, "清理完毕", reply)
 }
